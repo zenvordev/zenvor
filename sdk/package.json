@@ -1,0 +1,110 @@
+{
+  "name": "@zenvorprotocol/sdk",
+  "version": "0.2.0",
+  "description": "TypeScript SDK for Zenvor transfer APIs, wallet execution and developer registration",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist/*/browser.js",
+    "dist/*/browser.d.ts",
+    "dist/*/errors.js",
+    "dist/*/errors.d.ts",
+    "dist/*/registration.js",
+    "dist/*/registration.d.ts",
+    "dist/*/server.js",
+    "dist/*/server.d.ts",
+    "dist/*/transport.js",
+    "dist/*/transport.d.ts",
+    "dist/*/types.js",
+    "dist/*/types.d.ts",
+    "dist/*/validate.js",
+    "dist/*/validate.d.ts",
+    "dist/*/wallet.js",
+    "dist/*/wallet.d.ts",
+    "dist/cjs/package.json",
+    "README.md",
+    "SECURITY.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "main": "./dist/cjs/server.js",
+  "types": "./dist/esm/server.d.ts",
+  "exports": {
+    ".": {
+      "browser": {
+        "import": {
+          "types": "./dist/esm/browser.d.ts",
+          "default": "./dist/esm/browser.js"
+        },
+        "require": {
+          "types": "./dist/cjs/browser.d.ts",
+          "default": "./dist/cjs/browser.js"
+        }
+      },
+      "import": {
+        "types": "./dist/esm/server.d.ts",
+        "default": "./dist/esm/server.js"
+      },
+      "require": {
+        "types": "./dist/cjs/server.d.ts",
+        "default": "./dist/cjs/server.js"
+      }
+    },
+    "./wallet": {
+      "import": {
+        "types": "./dist/esm/wallet.d.ts",
+        "default": "./dist/esm/wallet.js"
+      },
+      "require": {
+        "types": "./dist/cjs/wallet.d.ts",
+        "default": "./dist/cjs/wallet.js"
+      }
+    },
+    "./registration": {
+      "import": {
+        "types": "./dist/esm/registration.d.ts",
+        "default": "./dist/esm/registration.js"
+      },
+      "require": {
+        "types": "./dist/cjs/registration.d.ts",
+        "default": "./dist/cjs/registration.js"
+      }
+    }
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "prepack": "npm run test",
+    "check:public": "node scripts/check-public.mjs",
+    "check:package": "npm run build && node scripts/check-package.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "private": false,
+  "homepage": "https://znvr.app/docs/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zenvordev/zenvor.git",
+    "directory": "sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/zenvordev/zenvor/issues"
+  },
+  "keywords": [
+    "zenvor",
+    "robinhood",
+    "ethereum",
+    "transfers",
+    "typescript",
+    "sdk"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

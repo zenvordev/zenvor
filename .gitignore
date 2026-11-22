@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.tgz
+coverage/
+.env
+.env.*
+.npmrc
+*.log
+*.sqlite*
+*.db*
+.DS_Store

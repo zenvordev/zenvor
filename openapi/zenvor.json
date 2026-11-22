@@ -1,0 +1,1465 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Zenvor Partner API",
+    "version": "1.1.0",
+    "description": "Zenvor Developer API. Free off-chain wallet-signature registration issues API keys; no registry contract or registration payment is required. Partner API on chain 4663. ETH/USDG Abstraction, Reactive Mesh and Multi-send; omitted asset defaults to ETH. USDG uses 6 decimals, minimum combined 0.001024, one exact approval, and abstraction/mesh multi-send routes. Flat 0.00001 ETH per successful execution; gas extra and approval fee-free. USDG needs the updated fee bundle and SDK 0.1.2; check /v1/features transferAssets before use. RWA baskets remain limited to 10 of 11 listed stock/ETF assets, excluding USDG. Invoice endpoints are a separate wallet-signed service. Generic ERC20 supports single-recipient abstraction by token contract address, metadata and optional balance discovery, 0\u201336 decimals and a 1024 raw-unit minimum. Check ERC20 in features before use. SDK 0.1.3 adds the typed integration; mesh, multi-send and invoices are not enabled for imported tokens."
+  },
+  "servers": [
+    {
+      "url": "https://znvr.app/api",
+      "description": "Production API"
+    },
+    {
+      "url": "http://127.0.0.1:3100",
+      "description": "Local development API"
+    }
+  ],
+  "security": [
+    {
+      "PartnerKey": []
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Liveness",
+        "operationId": "_health_get",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Typed error. 400 validation; 401 key; 409 preflight/nonce/expiry; 429 rate limit; 503 unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/features": {
+      "get": {
+        "summary": "Fee, methods and chain",
+        "operationId": "features_get",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Typed error. 400 validation; 401 key; 409 preflight/nonce/expiry; 429 rate limit; 503 unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/assets": {
+      "get": {
+        "summary": "Eleven supported RWA assets",
+        "operationId": "assets_get",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Typed error. 400 validation; 401 key; 409 preflight/nonce/expiry; 429 rate limit; 503 unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/balances": {
+      "get": {
+        "summary": "ETH, USDG and listed RWA balances",
+        "operationId": "balances_get",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Typed error. 400 validation; 401 key; 409 preflight/nonce/expiry; 429 rate limit; 503 unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "address",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]{40}$"
+            }
+          }
+        ]
+      }
+    },
+    "/v1/quotes": {
+      "post": {
+        "summary": "Freeze allocation, nonce and fee; quote valid 60 minutes",
+        "operationId": "quotes_post",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Quote"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Typed error. 400 validation; 401 key; 409 preflight/nonce/expiry; 429 rate limit; 503 unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuoteInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/approvals/prepare": {
+      "post": {
+        "summary": "Next RWA approval for the common executor; no service fee",
+        "operationId": "approvals_prepare_post",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Typed error. 400 validation; 401 key; 409 preflight/nonce/expiry; 429 rate limit; 503 unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string",
+                    "description": "Opaque signed token, bound to your partner key. Never edit."
+                  }
+                },
+                "required": [
+                  "quote"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/simulations": {
+      "post": {
+        "summary": "Real-state simulation without state overrides; valid 60 seconds",
+        "operationId": "simulations_post",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preflight"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Typed error. 400 validation; 401 key; 409 preflight/nonce/expiry; 429 rate limit; 503 unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string",
+                    "description": "Opaque signed token, bound to your partner key. Never edit."
+                  }
+                },
+                "required": [
+                  "quote"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/transactions/prepare": {
+      "post": {
+        "summary": "Fresh preflight then unsigned wallet request and tracking token",
+        "operationId": "transactions_prepare_post",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preflight"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Typed error. 400 validation; 401 key; 409 preflight/nonce/expiry; 429 rate limit; 503 unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "simulation": {
+                    "type": "string",
+                    "description": "Opaque signed token, bound to your partner key. Never edit."
+                  }
+                },
+                "required": [
+                  "simulation"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/transactions/status": {
+      "post": {
+        "summary": "Verify transaction and fee receipt; never broadcast",
+        "operationId": "transactions_status_post",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "unknown",
+                        "pending",
+                        "confirming",
+                        "reverted",
+                        "confirmed"
+                      ]
+                    },
+                    "feePaidWei": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "payouts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "hash": {
+                      "type": "string",
+                      "pattern": "^0x[0-9a-fA-F]{64}$"
+                    },
+                    "block": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "feePaidWei"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Typed error. 400 validation; 401 key; 409 preflight/nonce/expiry; 429 rate limit; 503 unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "tracking": {
+                    "type": "string",
+                    "description": "Opaque signed token, bound to your partner key. Never edit."
+                  },
+                  "hash": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$"
+                  }
+                },
+                "required": [
+                  "tracking",
+                  "hash"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/registration/config": {
+      "get": {
+        "summary": "Free off-chain registration policy and optional wallet key status",
+        "operationId": "registration_config_get",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mode": {
+                      "const": "offchain"
+                    },
+                    "chainId": {
+                      "const": 4663
+                    },
+                    "address": {
+                      "type": "null"
+                    },
+                    "codeHash": {
+                      "type": "null"
+                    },
+                    "feeWei": {
+                      "const": "0"
+                    },
+                    "feeEth": {
+                      "const": "0"
+                    },
+                    "receiver": {
+                      "type": "string",
+                      "pattern": "^0x[0-9a-fA-F]{40}$"
+                    },
+                    "confirmations": {
+                      "const": 0
+                    },
+                    "requesterKey": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "pattern": "^0x[0-9a-fA-F]{64}$",
+                      "description": "Stable backend developer ID; not an on-chain credential."
+                    },
+                    "hasApiKey": {
+                      "type": "boolean"
+                    },
+                    "request": {
+                      "type": "null"
+                    },
+                    "executionFee": {
+                      "type": "object",
+                      "properties": {
+                        "wei": {
+                          "const": "10000000000000"
+                        },
+                        "asset": {
+                          "const": "ETH"
+                        },
+                        "recipient": {
+                          "type": "string",
+                          "pattern": "^0x[0-9a-fA-F]{40}$"
+                        }
+                      },
+                      "required": [
+                        "wei",
+                        "asset",
+                        "recipient"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "mode",
+                    "chainId",
+                    "address",
+                    "codeHash",
+                    "feeWei",
+                    "feeEth",
+                    "receiver",
+                    "confirmations",
+                    "requesterKey",
+                    "hasApiKey",
+                    "request",
+                    "executionFee"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 invalid input; 401 signature/session invalid, expired or used; 409 key exists or no active key; 429 rate limit; 503 registration unavailable."
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "wallet",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ]
+      }
+    },
+    "/registration/challenge": {
+      "post": {
+        "summary": "Request a five-minute, wallet-bound authorization challenge",
+        "operationId": "registration_challenge_post",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "challenge": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "expiresAt": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "challenge",
+                    "message",
+                    "expiresAt"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 invalid input; 401 signature/session invalid, expired or used; 409 key exists or no active key; 429 rate limit; 503 registration unavailable."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "wallet": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "issue",
+                      "rotate",
+                      "revoke"
+                    ]
+                  }
+                },
+                "required": [
+                  "wallet",
+                  "action"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/registration/authenticate": {
+      "post": {
+        "summary": "Consume a wallet signature and return a 30-minute session",
+        "operationId": "registration_authenticate_post",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "session": {
+                      "type": "string"
+                    },
+                    "wallet": {
+                      "type": "string"
+                    },
+                    "action": {
+                      "type": "string"
+                    },
+                    "expiresInSeconds": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "session",
+                    "wallet",
+                    "action",
+                    "expiresInSeconds"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 invalid input; 401 signature/session invalid, expired or used; 409 key exists or no active key; 429 rate limit; 503 registration unavailable."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "challenge": {
+                    "type": "string"
+                  },
+                  "signature": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "challenge",
+                  "signature"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/registration/key": {
+      "post": {
+        "summary": "Issue, rotate or revoke an API key using a single-use wallet-authenticated session",
+        "operationId": "registration_key_post",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "apiKey": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "wallet": {
+                      "type": "string"
+                    },
+                    "requesterKey": {
+                      "type": "string"
+                    },
+                    "revoked": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "apiKey",
+                    "wallet",
+                    "requesterKey",
+                    "revoked",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 invalid input; 401 signature/session invalid, expired or used; 409 key exists or no active key; 429 rate limit; 503 registration unavailable."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "session": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "session"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/erc20/token": {
+      "get": {
+        "summary": "Discover an imported ERC-20 token and optional sender balance",
+        "parameters": [
+          {
+            "name": "address",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]{40}$"
+            }
+          },
+          {
+            "name": "sender",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]{40}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chain 4663, token identity including symbol, decimals and address; optional balanceRaw string."
+          },
+          "400": {
+            "description": "Invalid or incompatible token"
+          }
+        }
+      }
+    },
+    "/v1/transactions/track": {
+      "post": {
+        "summary": "Persist a broadcast execution hash for confirmation and usage counting",
+        "description": "Register once after wallet broadcast. No server signing, broadcasting or block scanning. Existing status requests also enroll hashes. Retry registration, never the wallet execution, if registration fails.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "tracking",
+                  "hash"
+                ],
+                "properties": {
+                  "tracking": {
+                    "type": "string"
+                  },
+                  "hash": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Durable registration accepted; returns registered:true, hash and state (queued, confirmed, reverted, failed or expired)."
+          },
+          "429": {
+            "description": "Pending queue limit reached; retry registration later."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "PartnerKey": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "QuoteInput": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "sender": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "seed": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$"
+              },
+              "method": {
+                "const": "abstraction"
+              },
+              "recipient": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "amount": {
+                "type": "string",
+                "pattern": "^[0-9]+(\\.[0-9]{1,18})?$"
+              },
+              "asset": {
+                "type": "string",
+                "enum": [
+                  "ETH"
+                ],
+                "default": "ETH",
+                "description": "Omission preserves ETH behavior."
+              }
+            },
+            "required": [
+              "method",
+              "sender",
+              "recipient",
+              "amount"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "sender": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "seed": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$"
+              },
+              "method": {
+                "const": "mesh"
+              },
+              "recipient": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "amount": {
+                "type": "string",
+                "pattern": "^[0-9]+(\\.[0-9]{1,18})?$"
+              },
+              "asset": {
+                "type": "string",
+                "enum": [
+                  "ETH"
+                ],
+                "default": "ETH",
+                "description": "Omission preserves ETH behavior."
+              }
+            },
+            "required": [
+              "method",
+              "sender",
+              "recipient",
+              "amount"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "sender": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "seed": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$"
+              },
+              "method": {
+                "const": "multisend"
+              },
+              "recipients": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 100,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-fA-F]{40}$"
+                }
+              },
+              "route": {
+                "enum": [
+                  "direct",
+                  "abstraction",
+                  "mesh"
+                ],
+                "default": "abstraction"
+              },
+              "allocation": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "mode": {
+                        "const": "fixed"
+                      },
+                      "amount": {
+                        "type": "string",
+                        "pattern": "^[0-9]+(\\.[0-9]{1,18})?$"
+                      }
+                    },
+                    "required": [
+                      "mode",
+                      "amount"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "mode": {
+                        "const": "random"
+                      },
+                      "min": {
+                        "type": "string",
+                        "pattern": "^[0-9]+(\\.[0-9]{1,18})?$"
+                      },
+                      "max": {
+                        "type": "string",
+                        "pattern": "^[0-9]+(\\.[0-9]{1,18})?$"
+                      }
+                    },
+                    "required": [
+                      "mode",
+                      "min",
+                      "max"
+                    ]
+                  }
+                ]
+              },
+              "asset": {
+                "type": "string",
+                "enum": [
+                  "ETH"
+                ],
+                "default": "ETH",
+                "description": "Omission preserves ETH behavior."
+              }
+            },
+            "required": [
+              "method",
+              "sender",
+              "recipients",
+              "allocation"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "sender": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "seed": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$"
+              },
+              "method": {
+                "const": "rwa"
+              },
+              "recipient": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "items": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 10,
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "symbol": {
+                          "enum": [
+                            "NVDA",
+                            "AAPL",
+                            "TSLA",
+                            "MSFT",
+                            "AMZN",
+                            "GOOGL",
+                            "META",
+                            "SPY",
+                            "MSTR",
+                            "QQQ",
+                            "AMD"
+                          ]
+                        },
+                        "amount": {
+                          "type": "string",
+                          "pattern": "^[0-9]+(\\.[0-9]{1,18})?$"
+                        }
+                      },
+                      "required": [
+                        "symbol",
+                        "amount"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "symbol": {
+                          "enum": [
+                            "NVDA",
+                            "AAPL",
+                            "TSLA",
+                            "MSFT",
+                            "AMZN",
+                            "GOOGL",
+                            "META",
+                            "SPY",
+                            "MSTR",
+                            "QQQ",
+                            "AMD"
+                          ]
+                        },
+                        "percentage": {
+                          "enum": [
+                            25,
+                            50,
+                            75,
+                            100
+                          ]
+                        }
+                      },
+                      "required": [
+                        "symbol",
+                        "percentage"
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            "required": [
+              "method",
+              "sender",
+              "recipient",
+              "items"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "sender": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "seed": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$"
+              },
+              "method": {
+                "const": "abstraction"
+              },
+              "recipient": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "amount": {
+                "type": "string",
+                "pattern": "^[0-9]+(\\.[0-9]{1,6})?$"
+              },
+              "asset": {
+                "const": "USDG"
+              }
+            },
+            "required": [
+              "method",
+              "sender",
+              "recipient",
+              "amount",
+              "asset"
+            ],
+            "description": "USDG: positive six-decimal strings, combined minimum 0.001024. Execution value is the ETH API fee only; gas is additional."
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "sender": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "seed": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$"
+              },
+              "method": {
+                "const": "mesh"
+              },
+              "recipient": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "amount": {
+                "type": "string",
+                "pattern": "^[0-9]+(\\.[0-9]{1,6})?$"
+              },
+              "asset": {
+                "const": "USDG"
+              }
+            },
+            "required": [
+              "method",
+              "sender",
+              "recipient",
+              "amount",
+              "asset"
+            ],
+            "description": "USDG: positive six-decimal strings, combined minimum 0.001024. Execution value is the ETH API fee only; gas is additional."
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "sender": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "seed": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$"
+              },
+              "method": {
+                "const": "multisend"
+              },
+              "recipients": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 100,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-fA-F]{40}$"
+                }
+              },
+              "route": {
+                "enum": [
+                  "abstraction",
+                  "mesh"
+                ],
+                "default": "abstraction"
+              },
+              "allocation": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "mode": {
+                        "const": "fixed"
+                      },
+                      "amount": {
+                        "type": "string",
+                        "pattern": "^[0-9]+(\\.[0-9]{1,6})?$"
+                      }
+                    },
+                    "required": [
+                      "mode",
+                      "amount"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "mode": {
+                        "const": "random"
+                      },
+                      "min": {
+                        "type": "string",
+                        "pattern": "^[0-9]+(\\.[0-9]{1,6})?$"
+                      },
+                      "max": {
+                        "type": "string",
+                        "pattern": "^[0-9]+(\\.[0-9]{1,6})?$"
+                      }
+                    },
+                    "required": [
+                      "mode",
+                      "min",
+                      "max"
+                    ]
+                  }
+                ]
+              },
+              "asset": {
+                "const": "USDG"
+              }
+            },
+            "required": [
+              "method",
+              "sender",
+              "recipients",
+              "allocation",
+              "asset"
+            ],
+            "description": "USDG: positive six-decimal strings, combined minimum 0.001024. Execution value is the ETH API fee only; gas is additional."
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "sender": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "seed": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$"
+              },
+              "method": {
+                "const": "abstraction"
+              },
+              "recipient": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "amount": {
+                "type": "string",
+                "pattern": "^\\d{1,78}(\\.\\d{1,36})?$",
+                "description": "Exact token precision is validated from on-chain decimals. Minimum 1024 raw units."
+              },
+              "asset": {
+                "const": "ERC20"
+              },
+              "token": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              }
+            },
+            "required": [
+              "method",
+              "sender",
+              "recipient",
+              "amount",
+              "asset",
+              "token"
+            ]
+          }
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "Transaction": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$"
+          },
+          "to": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$"
+          },
+          "chainId": {
+            "const": "0x1237"
+          },
+          "nonce": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          },
+          "gas": {
+            "type": "string"
+          },
+          "gasPrice": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "chainId",
+          "nonce",
+          "value",
+          "data",
+          "gas"
+        ]
+      },
+      "Fee": {
+        "type": "object",
+        "required": [
+          "asset",
+          "amount",
+          "wei",
+          "recipient",
+          "basis"
+        ],
+        "properties": {
+          "asset": {
+            "const": "ETH"
+          },
+          "amount": {
+            "const": "0.00001"
+          },
+          "wei": {
+            "const": "10000000000000"
+          },
+          "recipient": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$"
+          },
+          "basis": {
+            "const": "per successful execution"
+          }
+        }
+      },
+      "Quote": {
+        "type": "object",
+        "required": [
+          "quote",
+          "quoteId",
+          "expiresInSeconds",
+          "executor",
+          "fee",
+          "nativeValueWei",
+          "payouts",
+          "approvalCount",
+          "approvals"
+        ],
+        "properties": {
+          "quote": {
+            "type": "string"
+          },
+          "quoteId": {
+            "type": "string"
+          },
+          "expiresInSeconds": {
+            "type": "integer"
+          },
+          "executor": {
+            "type": "string"
+          },
+          "fee": {
+            "$ref": "#/components/schemas/Fee"
+          },
+          "nativeValueWei": {
+            "type": "string"
+          },
+          "payouts": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "approvalCount": {
+            "type": "integer"
+          },
+          "approvals": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      },
+      "Preflight": {
+        "type": "object",
+        "required": [
+          "request",
+          "executor",
+          "payouts",
+          "feeWei",
+          "maxGasCostWei",
+          "block"
+        ],
+        "properties": {
+          "request": {
+            "$ref": "#/components/schemas/Transaction"
+          },
+          "executor": {
+            "type": "string"
+          },
+          "payouts": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "feeWei": {
+            "const": "10000000000000"
+          },
+          "maxGasCostWei": {
+            "type": "string"
+          },
+          "block": {
+            "type": "string"
+          },
+          "simulation": {
+            "type": "string"
+          },
+          "expiresInSeconds": {
+            "type": "integer"
+          },
+          "tracking": {
+            "type": "string"
+          },
+          "instruction": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
